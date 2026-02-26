@@ -1,0 +1,174 @@
+/**
+* oooooooooo    oooooooo8      ooooooooo  ooooooooooo o
+*  888    888 o888     88       888    88o 888    88 888
+*  888oooo88  888               888    888 888ooo8  8  88
+*  888    888 888o     oo       888    888 888     8oooo88
+* o888ooo888   888oooo88       o888ooo88  o888o  o88o  o888o
+*
+* mersadhaddad - mersaadh
+* 2026
+*/
+
+/* DFA */
+states_count  = -1
+alphabet_size = -1
+start_node    = -1
+
+/* INPUT */
+input_buffer  = 0
+buffer_length = 0
+input_ptr     = 0
+
+ibase = 10
+obase = 10
+
+define is_node_valid(p_num) {
+	if (p_num < 0 || p_num >= states_count) {
+		return 0
+	}
+	return 1
+}
+
+define is_alphabet_valid(p_num) {
+	if (p_num >= 0 && p_num < alphabet_size) {
+		return 1
+	}
+	return 0
+}
+
+define reset_states() {
+	auto i, total_cells
+
+	if (states_count == -1) {
+		print "[ERROR] Machine is not defined!\n"
+		return -1
+	}
+
+	total_cells = states_count * alphabet_size
+
+	for (i = 0; i < total_cells; i++) {
+		states[i] = -1
+	}
+
+	for (i = 0; i < states_count; i++) {
+        is_accept[i] = 0
+    }
+
+	print "[INFO] ALl states deleted!\n"
+}
+
+define reset_machine() {
+
+	reset_states()
+
+	states_count  = -1
+	alphabet_size = -1
+	start_node    = -1
+
+	print "[INFO] Machine restarted!\n"
+}
+
+define create_machine(p_states_count, p_alphabet_size) {
+	if (p_states_count < 1) {
+		print "States Count invalid!\n"
+		return -1
+	}
+	if (p_alphabet_size < 0) {
+		print "Alphabet Size invalid!\n"
+		return -1
+	}
+
+	states_count  = p_states_count
+	alphabet_size = p_alphabet_size
+
+	print "[INFO] Machine created!\n"
+}
+
+define define_state(p_alphabet_num, p_from, p_to) {
+	if (!is_node_valid(p_from) || !is_node_valid(p_to)) {
+		print "Invalid start node value!\n"
+		return -1
+	}
+	if (!is_alphabet_valid(p_alphabet_num)) {
+		print "Invalid Alphabet Number!\n"
+		return -1
+	}
+	states[p_from * alphabet_size + p_alphabet_num] = p_to
+}
+
+define define_accept(p_state) {
+	if (!is_node_valid(p_state)) {
+		print "Invalid start node value!\n"
+		return -1
+	}
+	is_accept[p_state] = 1
+}
+
+define define_start_node(p_state) {
+	if (!is_node_valid(p_state)) {
+		print "Invalid start node value!\n"
+		return -1
+	}
+	start_node = p_state
+}
+
+define begin_input() {
+	auto i
+	input_ptr     = 0
+	buffer_length = 0
+	print "--- Begin Input\n"
+}
+
+define d(p_input) {
+	input_buffer[input_ptr] = p_input
+	input_ptr++
+	buffer_length = input_ptr
+}
+
+define end_input() {
+	print "--- End Input\n"
+}
+
+define run_machine() {
+	auto i, current_s, digit, old_scale, old_state
+
+	if (start_node == -1) {
+		print "[ERROR] start node is not defined!\n"
+		return -1
+	}
+
+	current_s  = start_node
+	old_scale  = scale
+	scale      = 0
+
+	print "Start -> q", current_s, "\n"
+
+	for (i = 0; i < buffer_length; i++) {
+		digit = input_buffer[i]
+
+		if (!is_alphabet_valid(digit)) {
+			print "[ERROR] symbol ", digit, " is not in alphabet!\n"
+			scale = old_scale
+			return -1
+		}
+		old_state = current_s
+		if (current_s != -1) {
+		    current_s = states[current_s * alphabet_size + digit]
+		}
+
+		print old_state, "  -- ", digit, " --> q", current_s, "\n"
+	}
+
+	scale = old_scale
+
+	print "\n"
+	print "------- Final State: ", current_s, "\n"
+
+    if (current_s >= 0) {
+        if (is_accept[current_s] == 1) {
+            print "[ACCEPT]\n"
+            return 1
+        }
+    }
+    print "[REJECT]\n"
+}
