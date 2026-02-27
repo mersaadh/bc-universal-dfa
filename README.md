@@ -40,3 +40,24 @@ end_input()
 
 run_machine()
 ```
+
+## 2. DFA Bash Wrapper
+
+### 2.1. Usage
+
+```bash
+./run_dfa.bash <path_to_dfa_file>
+```
+
+### 2.2. Example
+
+(e.g., `0101` or `101`)
+
+```bash
+./run_dfa.bash ex/alternating_bits.txt
+```
+
+## 3. Requirements
+
+1. **POSIX bc**
+2. **Unix-like Environment (or an Abacus 🧮)**
